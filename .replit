@@ -1,8 +1,0 @@
-[run]
-run = "uvicorn main:app --host 0.0.0.0 --port 8000"
-
-[deployment]
-run = ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-[env]
-PYTHON_LD_LIBRARY_PATH = "/home/runner/$REPL_SLUG/.pythonlibs/lib"
