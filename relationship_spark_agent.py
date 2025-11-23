@@ -247,7 +247,7 @@ def create_default_relationship_agent() -> RelationshipSparkAgent:
     工厂函数：创建一个默认配置好的 RelationshipSparkAgent。
     """
     llm = ChatBot(
-        llm_provider="gemini",          # ⭐ 根据自己实际环境改
-        model_name="gemini-2.5-pro",    # ⭐ 或你想用的模型名称
+        llm_provider="gemini",          # ⭐ 使用 Gemini
+        model_name="gemini-2.5-flash",  # ⭐ Flash 模型，速度快且速率限制更宽松
     )
     return RelationshipSparkAgent(llm=llm)

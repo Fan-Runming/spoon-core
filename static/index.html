@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>Relationship Spark Notebook</title>
+  <title>U NO HOO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
@@ -80,8 +80,11 @@
       background: #020617;
       padding: 10px 10px 6px;
       overflow-y: auto;
+      overflow-x: hidden;
       font-size: 13px;
       margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
     }
 
     .chat-message {
@@ -89,15 +92,17 @@
       max-width: 90%;
       line-height: 1.4;
       white-space: pre-wrap;
+      flex-shrink: 0;
     }
 
     .chat-message.user {
       align-self: flex-end;
-      text-align: right;
+      text-align: left;
     }
 
     .chat-message.agent {
       align-self: flex-start;
+      text-align: left;
     }
 
     .bubble {
@@ -301,7 +306,7 @@
   <div class="container">
     <!-- 左侧：对话式输入 -->
     <div class="panel">
-      <h1>Relationship Spark Notebook</h1>
+      <h1>U NO HOO</h1>
       <div class="subtitle">
         通过一段对话，把你和 Ta 的故事说出来。<br />
         Agent 会自动抽取姓名、联系方式、关系标签，并在缺失时向你追问。<br />

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug People List</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e293b; color: #e5e7eb; }
+        .person { background: #334155; padding: 10px; margin: 10px 0; border-radius: 8px; }
+        button { padding: 10px 20px; background: #22c55e; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 10px 5px; }
+    </style>
+</head>
+<body>
+    <h1>Debug: People List</h1>
+    <button onclick="fetchPeople()">获取人物列表</button>
+    <button onclick="addTestPerson()">添加测试人物</button>
+    <div id="output"></div>
+
+    <script>
+        async function fetchPeople() {
+            const res = await fetch('/api/people');
+            const data = await res.json();
+            const output = document.getElementById('output');
+            output.innerHTML = '<h2>数据库中共有 ' + data.length + ' 条记录:</h2>';
+            data.forEach((person, index) => {
+                output.innerHTML += `
+                    <div class="person">
+                        <strong>#${index + 1} - ID: ${person.id}</strong><br>
+                        标题: ${person.card_title || '(无)'}<br>
+                        姓名: ${person.name || '(无)'}<br>
+                        关系: ${person.relationship_to_me || '(无)'}
+                    </div>
+                `;
+            });
+        }
+
+        async function addTestPerson() {
+            const res = await fetch('/api/spark', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    scene: 'stay_in_touch',
+                    context: 'User: This is a test person number ' + Date.now()
+                })
+            });
+            const data = await res.json();
+            alert('添加成功! ID: ' + data.id);
+            fetchPeople();
+        }
+
+        // 自动加载
+        fetchPeople();
+    </script>
+</body>
+</html>
