@@ -2,15 +2,17 @@
 
 from pathlib import Path
 from typing import List, Optional
+import uuid
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 from pydantic import BaseModel
 
 from relationship_spark_agent import create_default_relationship_agent
+from spoon_ai.tools.apify_linkedin import scrape_linkedin_profile, extract_profile_info
 
 # ---------- FastAPI 初始化 ----------
 app = FastAPI(title="Relationship Spark Agent API")
@@ -47,6 +49,8 @@ class PersonRecord(BaseModel):
     card_title: str
     suggestion: str
     summary: str
+    
+    # ⭐ 新增：照片 URL 列表
     photos: List[str] = []
 
 
@@ -149,42 +153,7 @@ async def create_spark(req: SparkRequest):
 # ---------- API: /api/people （列出所有记录的人物） ----------
 @app.get("/api/people", response_model=List[PersonRecord])
 async def list_people():
-    # 返回时把最近的记录放前面（最新的在最前），便于前端展示“最近记录”
-    return list(reversed(PEOPLE_DB))
-
-
-# ---------- API: 上传照片并关联到某个人物 ----------
-from fastapi import UploadFile, File, Form
-from fastapi.responses import JSONResponse
-import shutil
-
-
-@app.post("/api/upload_photo")
-async def upload_photo(file: UploadFile = File(...), id: Optional[int] = Form(None)):
-    """
-    接收上传的图片文件，把文件保存到 static/uploads，并（如果提供 id）把图片 URL 关联到对应的 PersonRecord。
-    返回 { url: "/static/uploads/xxx.jpg", id: <person id or null> }
-    """
-    uploads_dir = STATIC_DIR / "uploads"
-    uploads_dir.mkdir(parents=True, exist_ok=True)
-
-    # 安全的文件名处理（这里简化为使用原始名；生产中应 sanitize）
-    dest = uploads_dir / file.filename
-    with dest.open("wb") as f:
-        shutil.copyfileobj(file.file, f)
-
-    url = f"/static/uploads/{file.filename}"
-
-    # 如果提供了 id，则关联到该人物记录
-    if id is not None:
-        for p in PEOPLE_DB:
-            if p.id == int(id):
-                if not hasattr(p, "photos"):
-                    p.photos = []
-                p.photos.append(url)
-                return JSONResponse({"url": url, "id": p.id})
-
-    return JSONResponse({"url": url, "id": None})
+    return PEOPLE_DB
 
 
 # ---------- API: /api/search_people?q=... （搜索已有卡片） ----------
@@ -236,3 +205,144 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 async def read_root():
     index_file = STATIC_DIR / "index.html"
     return index_file.read_text(encoding="utf-8")
+
+
+# ---------- API: /api/upload_photo（上传照片并关联到人物） ----------
+@app.post("/api/upload_photo")
+async def upload_photo(
+    file: UploadFile = File(...),
+    id: Optional[int] = Form(None)
+):
+    """
+    上传照片并保存到 static/uploads/，如果提供了 id 就关联到对应的人物。
+    返回 JSON: {"url": "/static/uploads/xxx.jpg", "id": <person_id or null>}
+    """
+    try:
+        # 检查 content_type
+        if not file.content_type or not file.content_type.startswith("image/"):
+            return JSONResponse(
+                status_code=400,
+                content={"error": "Invalid file type. Only images are allowed."}
+            )
+        
+        # 生成唯一文件名
+        ext = Path(file.filename).suffix if file.filename else ".jpg"
+        unique_name = f"{uuid.uuid4()}{ext}"
+        upload_dir = STATIC_DIR / "uploads"
+        upload_dir.mkdir(exist_ok=True)
+        
+        file_path = upload_dir / unique_name
+        
+        # 保存文件
+        content = await file.read()
+        file_path.write_bytes(content)
+        
+        public_url = f"/static/uploads/{unique_name}"
+        
+        # 如果提供了 id，关联到对应的人物
+        if id is not None:
+            for p in PEOPLE_DB:
+                if p.id == id:
+                    if public_url not in p.photos:
+                        p.photos.append(public_url)
+                    return JSONResponse(content={"url": public_url, "id": id})
+            # id 不存在
+            return JSONResponse(
+                status_code=404,
+                content={"error": f"Person with id={id} not found"}
+            )
+        
+        # 未提供 id，只返回 URL
+        return JSONResponse(content={"url": public_url, "id": None})
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Upload failed: {str(e)}"}
+        )
+
+
+# ---------- API: /api/enrich_linkedin（通过 LinkedIn URL 抓取并丰富人物卡片） ----------
+class LinkedInEnrichRequest(BaseModel):
+    linkedin_url: str
+    person_id: Optional[int] = None  # 如果提供，更新该人物；否则创建新人物
+
+
+@app.post("/api/enrich_linkedin")
+async def enrich_linkedin(req: LinkedInEnrichRequest):
+    """
+    使用 Apify LinkedIn Profile Scraper 抓取个人资料并丰富 PersonRecord。
+    
+    参数:
+        linkedin_url: LinkedIn 个人资料 URL
+        person_id: 可选，如果提供则更新对应人物；否则创建新人物
+    
+    返回:
+        更新后的 PersonRecord
+    """
+    global NEXT_ID
+    
+    # 调用 Apify scraper
+    try:
+        profile_data = await scrape_linkedin_profile(req.linkedin_url, timeout=120)
+        if not profile_data:
+            raise HTTPException(status_code=500, detail="Failed to scrape LinkedIn profile")
+        
+        extracted = extract_profile_info(profile_data)
+        
+        # 查找或创建 PersonRecord
+        existing_record = None
+        if req.person_id is not None:
+            for p in PEOPLE_DB:
+                if p.id == req.person_id:
+                    existing_record = p
+                    break
+        
+        if existing_record:
+            # 更新已有记录
+            if extracted.get("name"):
+                existing_record.name = extracted["name"]
+            if extracted.get("location"):
+                existing_record.location = extracted["location"]
+            if extracted.get("headline"):
+                existing_record.relationship_to_me = extracted["headline"]
+            
+            # 合并 tags（去重）
+            existing_record.career_tags = list(dict.fromkeys(
+                existing_record.career_tags + extracted.get("career_tags", [])
+            ))[:8]
+            existing_record.interest_tags = list(dict.fromkeys(
+                existing_record.interest_tags + extracted.get("interest_tags", [])
+            ))[:10]
+            
+            # 更新 summary
+            if extracted.get("summary_text"):
+                existing_record.summary = extracted["summary_text"][:500]
+            
+            return existing_record
+        else:
+            # 创建新记录
+            new_record = PersonRecord(
+                id=NEXT_ID,
+                scene="professional_networking",
+                context=f"从 LinkedIn 导入: {req.linkedin_url}",
+                name=extracted.get("name", ""),
+                main_contact=req.linkedin_url,
+                relationship_to_me=extracted.get("headline", ""),
+                location=extracted.get("location", ""),
+                career_tags=extracted.get("career_tags", []),
+                interest_tags=extracted.get("interest_tags", []),
+                personality_tags=[],
+                goal_tags=[],
+                card_title=f"{extracted.get('name', 'LinkedIn Contact')} - {extracted.get('headline', '')}",
+                summary=extracted.get("summary_text", "")[:500],
+                suggestion="可以通过 LinkedIn 联系并建立专业关系。",
+                photos=[]
+            )
+            PEOPLE_DB.append(new_record)
+            NEXT_ID += 1
+            return new_record
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Enrichment failed: {str(e)}")
+

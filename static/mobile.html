@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Relationship Spark — Mobile Preview</title>
+  <style>
+    :root{background:#eef7ff}
+    body{margin:0;font-family:Inter, "SF Pro Text", system-ui, -apple-system, "Segoe UI", Roboto, Arial;background:linear-gradient(180deg,#f7fbff,#eef6ff);display:flex;align-items:center;justify-content:center;height:100vh}
+    .device{width:420px;max-width:92vw;height:860px;max-height:96vh;border-radius:28px;overflow:hidden;box-shadow:0 30px 80px rgba(8,20,40,0.12);background:linear-gradient(180deg,rgba(255,255,255,0.7),rgba(250,252,255,0.6));border:1px solid rgba(255,255,255,0.6);display:flex;flex-direction:column}
+    header{padding:14px 16px;display:flex;align-items:center;gap:12px}
+    header .device-title{font-weight:800;color:#071226;font-size:16px}
+    .frame{flex:1;background:#fff}
+    iframe{width:100%;height:100%;border:0;display:block}
+    .note{margin-top:12px;font-size:13px;color:#667085;text-align:center}
+    @media (max-width:480px){.device{width:94vw;height:94vh;border-radius:20px}}
+  </style>
+</head>
+<body>
+  <div class="device" role="region" aria-label="mobile-preview">
+    <header>
+      <div class="device-title">Mobile Preview</div>
+    </header>
+    <div class="frame">
+      <!-- iframe 指向主服务的桌面页面（可修改为更合适的移动页面地址） -->
+      <iframe id="mobile-frame" src="http://127.0.0.1:8000/static/index.html" title="Relationship Spark Mobile View"></iframe>
+    </div>
+  </div>
+  <div class="note">确保主服务在 <strong>http://127.0.0.1:8000</strong> 运行；移动预览通过 <strong>端口 8001</strong> 打开。</div>
+</body>
+</html>

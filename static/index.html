@@ -93,7 +93,6 @@
 
     .chat-message.user {
       align-self: flex-end;
-      text-align: right;
     }
 
     .chat-message.agent {
@@ -104,6 +103,8 @@
       display: inline-block;
       padding: 7px 10px;
       border-radius: 12px;
+      /* 文本左对齐（气泡在右侧，但文字左对齐以提高可读性） */
+      text-align: left;
     }
 
     .bubble-user {
@@ -148,6 +149,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+    }
+
+    /* 录音中状态样式 */
+    .icon-btn.listening {
+      background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(14,165,233,0.08));
+      border-color: #22c55e;
+      color: #bbf7d0;
+      box-shadow: 0 4px 10px rgba(34,197,94,0.06);
     }
 
     button {
@@ -258,7 +267,8 @@
 
     .people-list {
       margin-top: 8px;
-      max-height: 260px;
+      /* 固定为页面高度的 40%，当内容超出时内部可滚动 */
+      height: 40vh;
       overflow-y: auto;
       padding-right: 4px;
     }
@@ -330,6 +340,7 @@
         <button id="attach-btn" class="icon-btn" title="上传照片">📷</button>
         <!-- 隐藏的文件选择器 -->
         <input id="photo-input" type="file" accept="image/*" style="display:none" />
+        <button id="new-btn" class="icon-btn" title="新建卡片">➕</button>
         <button id="send-btn">发送</button>
       </div>
 
@@ -439,9 +450,11 @@
       // 图片展示（如果有的话）
       let photosHtml = "";
       if (person.photos && person.photos.length > 0) {
-        photosHtml = `<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap">${person.photos
-          .map((p) => `<img src="${escapeHtml(p)}" style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #1f2937;"/>`)
-          .join("")}</div>`;
+        // 注意：不要在外层模板字符串中嵌套未转义的反引号，会导致 JS 语法错误
+        const imgs = person.photos
+          .map((p) => '<img src="' + escapeHtml(p) + '" style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #1f2937;"/>')
+          .join("");
+        photosHtml = '<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap">' + imgs + '</div>';
       }
 
       return `
@@ -764,37 +777,111 @@
       photoInput.value = null;
     });
 
-    // 语音识别（Web Speech API）
-    let recognition = null;
-    let recognizing = false;
+    // “新建卡片”按钮：清除当前编辑状态，确保下一次发送是新建而非更新
+    const newBtn = document.getElementById("new-btn");
+    if (newBtn) {
+      newBtn.addEventListener("click", () => {
+        currentPersonId = null;
+        knownName = null;
+        knownMainContact = null;
+        pendingQuestion = null;
+        // 清空对话窗口和当前卡片显示（保留引导提示）
+        chatHistory.length = 0;
+        chatWindow.innerHTML = "";
+        appendMessage(
+          "agent",
+          "已开始新建一张人物卡片：先选场景，然后用一两句话跟我说这个人。"
+        );
+        currentCardEl.innerHTML = `
+          <div class="card-title">还没有卡片</div>
+          <div class="card-subtitle">在左边开始一段对话，然后我会帮你生成关于 Ta 的人物卡片。</div>
+        `;
+      });
+    }
+
+  // 语音识别（Web Speech API）
+  let recognition = null;
+  let recognizing = false;
+  // 当用户点击开始录音后置为 true；用户点击停止或出错则为 false
+  let recordingActive = false;
+  // 存储最后一次的最终转写，用于在停止录音时把结果写入输入框
+  let lastFinalTranscript = "";
     function setupRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return null;
       const r = new SpeechRecognition();
-      r.lang = "zh-CN";
-      r.interimResults = false;
-      r.maxAlternatives = 1;
-      r.onstart = () => {
-        recognizing = true;
-        voiceBtn.textContent = "⏹️";
-        statusEl.textContent = "正在听写，点击停止或再次点击麦克风。";
-      };
+  r.lang = "zh-CN";
+  // 尽量保持连续识别，必要时在 onend 自动重启以维持“录音中”状态
+  r.continuous = true;
+  // 启用中间结果以便实时回显
+  r.interimResults = true;
+  r.maxAlternatives = 1;
+
       r.onend = () => {
+        // onend 在识别结束或被中断时触发
         recognizing = false;
+        voiceBtn.classList.remove('listening');
         voiceBtn.textContent = "🎤";
-        statusEl.textContent = "";
+
+        // 如果用户仍希望保持录音（未主动点击停止），则在短延迟后重启识别
+        if (recordingActive) {
+          // 小延迟可避免某些浏览器立即报错
+          setTimeout(() => {
+            try {
+              recognition.start();
+            } catch (e) {
+              console.error('failed to restart recognition', e);
+            }
+          }, 250);
+          // 继续显示为录音状态
+          voiceBtn.classList.add('listening');
+          voiceBtn.textContent = "⏹️";
+          statusEl.textContent = "正在听写，点击麦克风结束录音并将转写填入输入框。";
+          return;
+        }
+
+        // 否则（用户已停止）优先把 lastFinalTranscript 写入输入框（如果有），否则保持已有的中间文本
+        if (lastFinalTranscript) {
+          chatInput.value = lastFinalTranscript;
+          statusEl.textContent = "识别已结束，结果已填入输入框，点击发送或回车提交。";
+        } else if (chatInput.value) {
+          statusEl.textContent = "识别已结束，结果已填入输入框，点击发送或回车提交。";
+        } else {
+          statusEl.textContent = "未识别到语音或识别超时，请重试。";
+        }
       };
+      
+
       r.onerror = (e) => {
-        console.error(e);
+        console.error('SpeechRecognition error', e);
         recognizing = false;
+        voiceBtn.classList.remove('listening');
         voiceBtn.textContent = "🎤";
-        statusEl.textContent = "语音识别失败（请检查浏览器权限）。";
+        if (e && e.error === 'not-allowed') {
+          statusEl.textContent = '麦克风权限被拒绝，请在浏览器中允许访问麦克风。';
+        } else if (e && e.error === 'no-speech') {
+          statusEl.textContent = '未检测到语音，请再试一次。';
+        } else {
+          statusEl.textContent = '语音识别失败（请检查浏览器权限或刷新页面）。';
+        }
       };
+
       r.onresult = (ev) => {
-        const t = ev.results[0][0].transcript;
-        chatInput.value = t;
-        // 自动发送转写结果
-        handleSend();
+        // 汇总多条结果，显示中间转写并在最终结果时自动发送
+        let interim = '';
+        let finalTranscript = '';
+        for (let i = 0; i < ev.results.length; i++) {
+          const res = ev.results[i];
+          if (res.isFinal) {
+            finalTranscript += res[0].transcript;
+          } else {
+            interim += res[0].transcript;
+          }
+        }
+        // 优先显示最终文本，否则显示中间识别
+        const display = (finalTranscript || interim).trim();
+        chatInput.value = display;
+        // 如果有最终文本，仅填入输入框，不自动发送（让用户自己确认并发送）
       };
       return r;
     }
@@ -807,13 +894,23 @@
       }
 
       if (!recognizing) {
+        // 用户主动开始录音
+        recordingActive = true;
         try {
           recognition.start();
         } catch (e) {
-          console.error(e);
+          console.error('recognition.start error', e);
+          statusEl.textContent = '无法启动语音识别，请重试或刷新页面。';
+          recordingActive = false;
         }
       } else {
-        recognition.stop();
+        // 用户主动停止录音（会触发 onend）
+        recordingActive = false;
+        try {
+          recognition.stop();
+        } catch (e) {
+          console.error('recognition.stop error', e);
+        }
       }
     });
 
