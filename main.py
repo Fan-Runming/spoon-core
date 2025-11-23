@@ -47,7 +47,6 @@ class PersonRecord(BaseModel):
     card_title: str
     suggestion: str
     summary: str
-    photos: List[str] = []
 
 
 class SparkRequest(BaseModel):
@@ -149,42 +148,7 @@ async def create_spark(req: SparkRequest):
 # ---------- API: /api/people （列出所有记录的人物） ----------
 @app.get("/api/people", response_model=List[PersonRecord])
 async def list_people():
-    # 返回时把最近的记录放前面（最新的在最前），便于前端展示“最近记录”
-    return list(reversed(PEOPLE_DB))
-
-
-# ---------- API: 上传照片并关联到某个人物 ----------
-from fastapi import UploadFile, File, Form
-from fastapi.responses import JSONResponse
-import shutil
-
-
-@app.post("/api/upload_photo")
-async def upload_photo(file: UploadFile = File(...), id: Optional[int] = Form(None)):
-    """
-    接收上传的图片文件，把文件保存到 static/uploads，并（如果提供 id）把图片 URL 关联到对应的 PersonRecord。
-    返回 { url: "/static/uploads/xxx.jpg", id: <person id or null> }
-    """
-    uploads_dir = STATIC_DIR / "uploads"
-    uploads_dir.mkdir(parents=True, exist_ok=True)
-
-    # 安全的文件名处理（这里简化为使用原始名；生产中应 sanitize）
-    dest = uploads_dir / file.filename
-    with dest.open("wb") as f:
-        shutil.copyfileobj(file.file, f)
-
-    url = f"/static/uploads/{file.filename}"
-
-    # 如果提供了 id，则关联到该人物记录
-    if id is not None:
-        for p in PEOPLE_DB:
-            if p.id == int(id):
-                if not hasattr(p, "photos"):
-                    p.photos = []
-                p.photos.append(url)
-                return JSONResponse({"url": url, "id": p.id})
-
-    return JSONResponse({"url": url, "id": None})
+    return PEOPLE_DB
 
 
 # ---------- API: /api/search_people?q=... （搜索已有卡片） ----------

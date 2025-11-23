@@ -310,8 +310,8 @@
       <div class="subtitle">
         Tell me about someone in your life through a conversation.<br />
         The Agent will automatically extract names, contact info, and relationship tags, asking follow-up questions when needed.<br />
-        If you want to find someone from your existing contacts, try saying:<br />
-        <span style="color:#a5b4fc;">Example: "Find people with HCI background"</span>
+        如果你想从已有人物中“找人”，可以这样说：<br />
+        <span style="color:#a5b4fc;">例如：“找有人机交互背景的人聊聊”</span>
       </div>
 
       <label for="scene">Scene</label>
@@ -634,7 +634,7 @@
       }
     }
 
-    // Determine if a message is a "search query" or "person description"
+    // 判断一句话是“搜索请求”还是“描述人物”
     function isSearchQuery(text) {
       const t = text.trim().toLowerCase();
       if (!t) return false;
@@ -798,7 +798,7 @@
       r.onresult = (ev) => {
         const t = ev.results[0][0].transcript;
         chatInput.value = t;
-        // Automatically send transcription result
+        // 自动Send转写结果
         handleSend();
       };
       return r;
@@ -825,7 +825,7 @@
     // On page load, show welcome message + load existing cards list
     appendMessage(
       "agent",
-      "Hi! First, select a general scene, then tell me about this person in a sentence or two. For example: where you met, what they're like, and what kind of relationship you want to maintain.\n\nIf you want to find someone from your existing contacts, just say: 'Find people with HCI background.'"
+      "嗨～先选一个大致场景，然后用一两句话跟我说说这个人。比如：我们在哪里认识、Ta 是怎样的人，你现在想跟 Ta 保持怎样的关系。\n\n如果你想从已经记录的人里“找人”，可以直接说：找有人机交互背景的人聊聊。"
     );
     loadPeople();
   </script>
