@@ -321,3 +321,53 @@ INFO:     127.0.0.1:57134 - "GET /api/people HTTP/1.1" 200 OK
 INFO:     127.0.0.1:57166 - "POST /api/spark HTTP/1.1" 200 OK
 INFO:     127.0.0.1:57195 - "GET /api/people HTTP/1.1" 200 OK
 INFO:     127.0.0.1:57201 - "POST /api/spark HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'test_agent.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [80192]
+WARNING:  WatchFiles detected changes in 'my_first_agent.py'. Reloading...
+INFO:     Started server process [80456]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Started server process [80457]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:57616 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57616 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57634 - "POST /api/spark HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'my_first_agent.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [80457]
+WARNING:  WatchFiles detected changes in 'relationship_spark_agent.py'. Reloading...
+INFO:     Started server process [80507]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Started server process [80513]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:57756 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57781 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57941 - "GET /api/people HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'relationship_spark_agent.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [80513]
+INFO:     Started server process [80644]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:58164 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58164 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58164 - "GET /api/people HTTP/1.1" 200 OK
+[f619dbcb-d987-48e5-b216-7b865d4739e2] gemini.chat_with_tools failed: [gemini] Request failed: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'The model is overloaded. Please try again later.', 'status': 'UNAVAILABLE'}}
+Exception in state context for agent relationship_spark_agent: [gemini] Request failed: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'The model is overloaded. Please try again later.', 'status': 'UNAVAILABLE'}}
+Error during agent run: [gemini] Request failed: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'The model is overloaded. Please try again later.', 'status': 'UNAVAILABLE'}}
+INFO:     127.0.0.1:58184 - "POST /api/spark HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:58219 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58254 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58254 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58268 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58287 - "GET /api/people HTTP/1.1" 200 OK

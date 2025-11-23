@@ -285,6 +285,13 @@
       transition: border-color 0.15s, background 0.15s;
     }
 
+    /* Selected mini-card: gold outline */
+    .mini-card.selected {
+      border: 2px solid #d4af37; /* gold-ish */
+      box-shadow: 0 6px 20px rgba(212,175,55,0.14);
+      transform: translateY(-1px);
+    }
+
     .mini-card:hover {
       border-color: #4b5563;
       background: #020617;
@@ -689,6 +696,8 @@
         <div class="card-subtitle">Start a conversation on the left, and I'll help you create a profile card.</div>
       `;
       statusEl.textContent = '';
+      // clear any visual selection in the mini-card list
+      updateSelectedMiniCard();
     }
 
     // Set the current editing person for the conversation UI.
@@ -704,6 +713,19 @@
       if (!silent) {
         const displayName = person.name || '(Unnamed)';
         appendMessage('agent', `Now editing ${displayName}'s profile. Continue the conversation to update their card.`);
+      }
+    }
+
+    // Helper to visually mark the selected mini-card in the list
+    function updateSelectedMiniCard() {
+      // remove selected from all
+      peopleListEl.querySelectorAll('.mini-card.selected').forEach((el) => el.classList.remove('selected'));
+      if (currentPersonId === null || currentPersonId === undefined) return;
+      const sel = peopleListEl.querySelector(`.mini-card[data-id="${currentPersonId}"]`);
+      if (sel) {
+        sel.classList.add('selected');
+        // ensure it's visible in the scroll area
+        try { sel.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
       }
     }
 
@@ -905,10 +927,16 @@
                 if (p) {
                   currentCardEl.innerHTML = renderPersonCard(p);
                   setEditingPerson(p);
+                  // update visual selection
+                  updateSelectedMiniCard();
                 }
               }).catch(() => {});
             }
           });
+          // if this replaced element corresponds to the currently selected person, mark it
+          if (currentPersonId && Number(el.getAttribute('data-id')) === Number(currentPersonId)) {
+            el.classList.add('selected');
+          }
         }
       } else {
         // Prepend the new mini card so newest appears at top
@@ -929,10 +957,15 @@
                 if (p) {
                   currentCardEl.innerHTML = renderPersonCard(p);
                   setEditingPerson(p);
+                  updateSelectedMiniCard();
                 }
               }).catch(() => {});
             }
           });
+          // if this new element is the one we're editing, mark as selected
+          if (currentPersonId && Number(newEl.getAttribute('data-id')) === Number(currentPersonId)) {
+            newEl.classList.add('selected');
+          }
         }
       }
     }
@@ -972,9 +1005,15 @@
               el.addEventListener("click", () => {
                 const id = Number(el.getAttribute("data-id"));
                 const person = data.find((p) => p.id === id);
-                if (person) currentCardEl.innerHTML = renderPersonCard(person);
+                if (person) {
+                  currentCardEl.innerHTML = renderPersonCard(person);
+                  setEditingPerson(person);
+                  updateSelectedMiniCard();
+                }
               });
             });
+            // restore selected highlight after expanding list
+            updateSelectedMiniCard();
           });
           peopleListEl.appendChild(moreEl);
         }
@@ -987,9 +1026,12 @@
             if (person) {
               currentCardEl.innerHTML = renderPersonCard(person);
               setEditingPerson(person);
+              updateSelectedMiniCard();
             }
           });
         });
+        // If we already have a selected person, visually mark them
+        updateSelectedMiniCard();
       } catch (err) {
         console.error(err);
         peopleListEl.innerHTML = `<div style="font-size:12px;color:#f97373;">Failed to load people list.</div>`;
