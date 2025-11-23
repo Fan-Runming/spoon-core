@@ -1,0 +1,52 @@
+INFO:     Will watch for changes in these directories: ['/Users/evafan/Desktop/spoon-core']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [73006] using WatchFiles
+INFO:     Started server process [73008]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:65180 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65196 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65490 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65508 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65508 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65531 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49162 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49273 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49319 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49319 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49338 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49349 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49397 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49397 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'relationship_spark_agent.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [73008]
+INFO:     Started server process [73999]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:49628 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49628 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK

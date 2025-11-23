@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>U NO HOO</title>
+  <title>U-NO-HOO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
@@ -300,13 +300,272 @@
       font-size: 11px;
       color: #9ca3af;
     }
+
+    /* ========================================
+       MOBILE & RESPONSIVE STYLES
+       ======================================== */
+    
+    /* Tablet devices (portrait) */
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin: 16px auto;
+        padding: 0 12px;
+        max-width: 100%;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      h2 {
+        font-size: 16px;
+      }
+
+      .subtitle {
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+
+      .chat-window {
+        height: 280px;
+      }
+
+      .people-list {
+        max-height: 200px;
+      }
+    }
+
+    /* Mobile devices (phones) */
+    @media (max-width: 640px) {
+      body {
+        font-size: 14px;
+      }
+
+      .container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin: 12px auto;
+        padding: 0 8px;
+      }
+
+      .panel {
+        padding: 14px;
+        border-radius: 12px;
+      }
+
+      h1 {
+        font-size: 18px;
+        margin-bottom: 6px;
+      }
+
+      h2 {
+        font-size: 15px;
+      }
+
+      .subtitle {
+        font-size: 11px;
+        line-height: 1.5;
+        margin-bottom: 10px;
+      }
+
+      /* Make scene dropdown and label easier to tap */
+      label {
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+
+      select {
+        padding: 10px 12px;
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+
+      /* Optimize chat window for mobile */
+      .chat-window {
+        height: 320px;
+        padding: 8px;
+        margin-bottom: 8px;
+      }
+
+      .chat-message {
+        margin-bottom: 10px;
+        max-width: 85%;
+      }
+
+      .bubble {
+        padding: 8px 12px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      /* Larger touch targets for input */
+      .chat-input-row {
+        gap: 6px;
+        margin-top: 6px;
+      }
+
+      .chat-input {
+        padding: 10px 14px;
+        font-size: 14px;
+        border-radius: 999px;
+      }
+
+      .icon-btn {
+        padding: 10px 11px;
+        min-width: 42px;
+        min-height: 42px;
+        font-size: 16px;
+      }
+
+      button {
+        padding: 10px 16px;
+        font-size: 14px;
+        min-height: 42px;
+      }
+
+      /* Optimize card display for mobile */
+      .card {
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+      }
+
+      .card-title {
+        font-size: 16px;
+        margin-bottom: 4px;
+      }
+
+      .card-subtitle {
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+
+      .section-label {
+        font-size: 11px;
+        margin-bottom: 3px;
+      }
+
+      .section-text {
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 6px;
+      }
+
+      /* Make tags more readable on mobile */
+      .tag {
+        padding: 3px 9px;
+        font-size: 11px;
+        margin: 3px 5px 3px 0;
+      }
+
+      .tag-group-label {
+        font-size: 11px;
+        margin-bottom: 3px;
+      }
+
+      /* Optimize people list for mobile */
+      .people-list {
+        max-height: 240px;
+        margin-top: 6px;
+      }
+
+      .people-list-title {
+        font-size: 12px;
+        margin: 10px 0 6px;
+      }
+
+      .mini-card {
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        border-radius: 10px;
+      }
+
+      .mini-title {
+        font-size: 13px;
+        margin-bottom: 3px;
+      }
+
+      .mini-subtitle {
+        font-size: 11px;
+        line-height: 1.4;
+      }
+
+      /* Make "New Person" button more prominent on mobile */
+      #new-card-btn {
+        padding: 8px 14px !important;
+        font-size: 13px !important;
+        min-height: 36px;
+      }
+
+      .status {
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .card-meta {
+        font-size: 10px;
+      }
+    }
+
+    /* Extra small devices (very small phones) */
+    @media (max-width: 375px) {
+      .container {
+        padding: 0 6px;
+        margin: 8px auto;
+        gap: 10px;
+      }
+
+      .panel {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 17px;
+      }
+
+      .subtitle {
+        font-size: 10px;
+      }
+
+      .chat-window {
+        height: 280px;
+      }
+
+      .bubble {
+        font-size: 13px;
+        padding: 7px 11px;
+      }
+
+      .chat-input {
+        font-size: 13px;
+        padding: 9px 12px;
+      }
+
+      .icon-btn {
+        padding: 9px 10px;
+        min-width: 40px;
+        min-height: 40px;
+      }
+
+      button {
+        padding: 9px 14px;
+        font-size: 13px;
+        min-height: 40px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <!-- Left panel: Conversational input -->
     <div class="panel">
-      <h1>U NO HOO</h1>
+      <h1>U-NO-HOO</h1>
       <div class="subtitle">
         Tell me about someone in your life through a conversation.<br />
         The Agent will automatically extract names, contact info, and relationship tags, asking follow-up questions when needed.<br />
@@ -343,7 +602,12 @@
 
     <!-- Right panel: Card display + List -->
     <div class="panel">
-      <h2>✨ Current Profile Card</h2>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h2 style="margin:0;">✨ Current Profile Card</h2>
+        <button id="new-card-btn" style="background:#6366f1;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+          + New Person
+        </button>
+      </div>
 
       <div id="current-card" class="card">
         <div class="card-title">No card yet</div>
@@ -365,6 +629,7 @@
     const statusEl = document.getElementById("status");
     const currentCardEl = document.getElementById("current-card");
     const peopleListEl = document.getElementById("people-list");
+    const newCardBtn = document.getElementById("new-card-btn");
 
     // Chat history
     const chatHistory = []; // { role: 'user' | 'agent', text: string }
@@ -378,6 +643,36 @@
 
     // ⭐ Currently editing person ID (for updating the same card)
     let currentPersonId = null;
+
+    // Reset state for a new person (called when user switches scene or explicitly starts fresh)
+    function resetForNewPerson() {
+      currentPersonId = null;
+      knownName = null;
+      knownMainContact = null;
+      pendingQuestion = null;
+      chatHistory.length = 0; // clear chat history
+      chatWindow.innerHTML = ''; // clear chat UI
+      currentCardEl.innerHTML = `
+        <div class="card-title">No card yet</div>
+        <div class="card-subtitle">Start a conversation on the left, and I'll help you create a profile card.</div>
+      `;
+      statusEl.textContent = '';
+    }
+
+    // Listen to scene change to reset state for new person
+    sceneSelect.addEventListener('change', () => {
+      if (chatHistory.length > 0 || currentPersonId !== null) {
+        // Only reset if user has already started a conversation
+        resetForNewPerson();
+        appendMessage("agent", "Scene changed. Let's start fresh! Tell me about this new person.");
+      }
+    });
+
+    // New Person button: explicitly reset for adding a new person
+    newCardBtn.addEventListener('click', () => {
+      resetForNewPerson();
+      appendMessage("agent", "Ready to record a new person! Tell me about them.");
+    });
 
     function appendMessage(role, text) {
       chatHistory.push({ role, text });
@@ -504,6 +799,57 @@
       `;
     }
 
+    // Insert or update a mini card in the people list without reloading the whole list.
+    // This fixes the issue where a newly created person only appears after a full page refresh.
+    function upsertMiniCard(person) {
+      if (!person || !person.id) return;
+      // If list currently shows "No records yet.", replace it fully.
+      const noRecords = peopleListEl.querySelector('[style*="No records yet."]');
+
+      const existing = peopleListEl.querySelector(`.mini-card[data-id="${person.id}"]`);
+      const html = renderMiniCard(person);
+
+      if (existing) {
+        // replace the existing element
+        existing.outerHTML = html;
+        // rebind click on the replaced element
+        const el = peopleListEl.querySelector(`.mini-card[data-id="${person.id}"]`);
+        if (el) {
+          el.addEventListener('click', () => {
+            const id = Number(el.getAttribute('data-id'));
+            if (!isNaN(id)) {
+              // try to find person in current DOM dataset by id via fetch fallback
+              fetch('/api/people').then(r => r.ok ? r.json() : []).then(list => {
+                const p = Array.isArray(list) ? list.find((p) => p.id === id) : null;
+                if (p) currentCardEl.innerHTML = renderPersonCard(p);
+              }).catch(() => {});
+            }
+          });
+        }
+      } else {
+        // Prepend the new mini card so newest appears at top
+        if (peopleListEl.innerHTML.trim() === '' || peopleListEl.innerText.includes('No records yet.')) {
+          peopleListEl.innerHTML = html;
+        } else {
+          peopleListEl.innerHTML = html + peopleListEl.innerHTML;
+        }
+
+        // bind click for the newly inserted card
+        const newEl = peopleListEl.querySelector(`.mini-card[data-id="${person.id}"]`);
+        if (newEl) {
+          newEl.addEventListener('click', () => {
+            const id = Number(newEl.getAttribute('data-id'));
+            if (!isNaN(id)) {
+              fetch('/api/people').then(r => r.ok ? r.json() : []).then(list => {
+                const p = Array.isArray(list) ? list.find((p) => p.id === id) : null;
+                if (p) currentCardEl.innerHTML = renderPersonCard(p);
+              }).catch(() => {});
+            }
+          });
+        }
+      }
+    }
+
     function escapeHtml(str) {
       if (!str) return "";
       return String(str)
@@ -606,7 +952,13 @@
         currentCardEl.innerHTML = renderPersonCard(data);
         statusEl.textContent = "Done ✔ This card has been saved to the list below~";
 
-        await loadPeople();
+        // Update people list in-place to reflect the newly created/updated person
+        try {
+          upsertMiniCard(data);
+        } catch (e) {
+          // fallback to full reload if something goes wrong
+          await loadPeople();
+        }
 
         // Check if key information is missing: name / main contact
         if (!data.name && !knownName) {
