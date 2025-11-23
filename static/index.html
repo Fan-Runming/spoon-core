@@ -72,7 +72,9 @@
     }
 
     .chat-window {
-      flex: 1;
+      /* 固定高度，避免聊天框随内容不断拉长。内部可滚动 */
+      flex: none;
+      height: 340px;
       border-radius: 12px;
       border: 1px solid #1e293b;
       background: #020617;
@@ -123,6 +125,7 @@
       margin-top: 4px;
     }
 
+    /* 左右行内：输入框 + 语音/上传/发送按钮 */
     .chat-input {
       flex: 1;
       border-radius: 999px;
@@ -132,6 +135,19 @@
       padding: 8px 12px;
       font-size: 13px;
       box-sizing: border-box;
+    }
+
+    .icon-btn {
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid #334155;
+      background: transparent;
+      color: #e5e7eb;
+      cursor: pointer;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     button {
@@ -288,7 +304,9 @@
       <h1>Relationship Spark Notebook</h1>
       <div class="subtitle">
         通过一段对话，把你和 Ta 的故事说出来。<br />
-        Agent 会自动抽取姓名、联系方式、关系标签，并在缺失时向你追问。
+        Agent 会自动抽取姓名、联系方式、关系标签，并在缺失时向你追问。<br />
+        如果你想从已有人物中“找人”，可以这样说：<br />
+        <span style="color:#a5b4fc;">例如：“找有人机交互背景的人聊聊”</span>
       </div>
 
       <label for="scene">Scene / 场景</label>
@@ -306,8 +324,12 @@
         <input
           id="chat-input"
           class="chat-input"
-          placeholder="跟我说说 Ta 吧，比如：我们是在某次活动认识的、Ta 是怎样的人、你们现在的状态…"
+          placeholder="跟我说说 Ta 吧，或者直接说：找有人机交互背景的人。"
         />
+        <button id="voice-btn" class="icon-btn" title="语音输入">🎤</button>
+        <button id="attach-btn" class="icon-btn" title="上传照片">📷</button>
+        <!-- 隐藏的文件选择器 -->
+        <input id="photo-input" type="file" accept="image/*" style="display:none" />
         <button id="send-btn">发送</button>
       </div>
 
@@ -339,16 +361,18 @@
     const currentCardEl = document.getElementById("current-card");
     const peopleListEl = document.getElementById("people-list");
 
-    // 对话历史（只记录用户和 agent 的文本，后端用拼接后的文本）
+    // 对话历史
     const chatHistory = []; // { role: 'user' | 'agent', text: string }
 
-    // 通过追问得到的关键信息
+    // 追问得到的关键信息
     let knownName = null;
     let knownMainContact = null;
 
     // 当前是否在等用户回答某个追问字段
-    // 'name' | 'main_contact' | null
-    let pendingQuestion = null;
+    let pendingQuestion = null; // 'name' | 'main_contact' | null
+
+    // ⭐ 当前正在编辑的人物 id（用于更新同一张卡片）
+    let currentPersonId = null;
 
     function appendMessage(role, text) {
       chatHistory.push({ role, text });
@@ -366,7 +390,6 @@
     }
 
     function composeContextText() {
-      // 把对话历史拼成一大段文本
       return chatHistory
         .map((m) => (m.role === "user" ? `User: ${m.text}` : `Agent: ${m.text}`))
         .join("\n");
@@ -413,10 +436,24 @@
       const suggestion = person.suggestion || "";
       const summary = person.summary || "";
 
+      // 图片展示（如果有的话）
+      let photosHtml = "";
+      if (person.photos && person.photos.length > 0) {
+        photosHtml = `<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap">${person.photos
+          .map((p) => `<img src="${escapeHtml(p)}" style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #1f2937;"/>`)
+          .join("")}</div>`;
+      }
+
       return `
         <div class="card">
-          <div class="card-title">${title}</div>
-          <div class="card-subtitle">${nameLine}${relation}</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+            <div style="flex:1">
+              <div class="card-title">${title}</div>
+              <div class="card-subtitle">${nameLine}${relation}</div>
+            </div>
+          </div>
+
+          ${photosHtml}
 
           ${renderTags("personality", person.personality_tags)}
           ${renderTags("goal", person.goal_tags)}
@@ -442,15 +479,22 @@
     function renderMiniCard(person) {
       const title = escapeHtml(person.card_title || "未命名人物卡片");
       const subtitleParts = [];
-      if (person.name) subtitleParts.push(person.name);
-      if (person.relationship_to_me) subtitleParts.push(person.relationship_to_me);
+      if (person.name) subtitleParts.push(escapeHtml(person.name));
+      if (person.relationship_to_me) subtitleParts.push(escapeHtml(person.relationship_to_me));
 
       const subtitle = subtitleParts.join(" · ");
 
+      const avatar = person.photos && person.photos.length > 0 ? `<img src="${escapeHtml(
+        person.photos[0]
+      )}" style="width:44px;height:44px;object-fit:cover;border-radius:8px;margin-right:8px;border:1px solid #1f2937;"/>` : "";
+
       return `
-        <div class="mini-card" data-id="${person.id}">
-          <div class="mini-title">${title}</div>
-          <div class="mini-subtitle">${subtitle || "还没有填写姓名/关系"}</div>
+        <div class="mini-card" data-id="${person.id}" style="display:flex;align-items:center;">
+          ${avatar}
+          <div style="flex:1">
+            <div class="mini-title">${title}</div>
+            <div class="mini-subtitle">${subtitle || "还没有填写姓名/关系"}</div>
+          </div>
         </div>
       `;
     }
@@ -476,9 +520,28 @@
           return;
         }
 
-        peopleListEl.innerHTML = data.map(renderMiniCard).join("");
+        // 只显示最近的 5 条记录（数据已在后端按时间倒序返回）
+        const recent = data.slice(0, 5);
+        peopleListEl.innerHTML = recent.map(renderMiniCard).join("");
+        if (data.length > 5) {
+          const moreEl = document.createElement("div");
+          moreEl.style = "font-size:12px;color:#94a3b8;padding:6px 8px;border-top:1px dashed #1f2937;margin-top:6px;cursor:pointer;";
+          moreEl.textContent = `显示最近 ${data.length} 条中的前 5 条，点击查看全部`;
+          moreEl.addEventListener("click", () => {
+            peopleListEl.innerHTML = data.map(renderMiniCard).join("");
+            // 重新绑定点击
+            peopleListEl.querySelectorAll(".mini-card").forEach((el) => {
+              el.addEventListener("click", () => {
+                const id = Number(el.getAttribute("data-id"));
+                const person = data.find((p) => p.id === id);
+                if (person) currentCardEl.innerHTML = renderPersonCard(person);
+              });
+            });
+          });
+          peopleListEl.appendChild(moreEl);
+        }
 
-        // 点击 mini card 展示到当前卡片区域
+        // 点击 mini card 展示到当前卡片区域（初始绑定）
         peopleListEl.querySelectorAll(".mini-card").forEach((el) => {
           el.addEventListener("click", () => {
             const id = Number(el.getAttribute("data-id"));
@@ -517,6 +580,7 @@
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            id: currentPersonId,  // ⭐ 告诉后端当前是更新哪个人（第一次为 null）
             scene,
             context,
             name: knownName,
@@ -530,6 +594,10 @@
         }
 
         const data = await res.json();
+
+        // ⭐ 保存当前人的 id，以便后续更新同一张卡片
+        currentPersonId = data.id;
+
         currentCardEl.innerHTML = renderPersonCard(data);
         statusEl.textContent = "完成 ✔ 这张卡片已经被记录在右下角列表中～";
 
@@ -545,7 +613,6 @@
           appendMessage("agent", q);
           pendingQuestion = "main_contact";
         } else {
-          // 信息比较完整，可以给一个温柔的收尾提示（可选）
           if (!pendingQuestion) {
             appendMessage("agent", "我已经帮你记录好 Ta 啦～之后你也可以继续补充关于 Ta 的故事。");
           }
@@ -562,6 +629,61 @@
       }
     }
 
+    // 判断一句话是“搜索请求”还是“描述人物”
+    function isSearchQuery(text) {
+      const t = text.trim().toLowerCase();
+      if (!t) return false;
+      return (
+        t.startsWith("找") ||
+        t.startsWith("查找") ||
+        t.startsWith("search ") ||
+        t.startsWith("find ")
+      );
+    }
+
+    async function searchPeople(query) {
+      statusEl.textContent = "我在你的人物卡片里帮你找找看…";
+
+      try {
+        const res = await fetch("/api/search_people?q=" + encodeURIComponent(query));
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Server error: ${res.status} ${errText}`);
+        }
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          appendMessage(
+            "agent",
+            "我在你已经记录的人物里暂时没有找到和这句话特别相关的人。你可以换个关键词试试，比如具体一点的方向、城市或学校。"
+          );
+          statusEl.textContent = "";
+          return;
+        }
+
+        // 拼一段推荐话
+        let reply = "我觉得你可以考虑联系这些人：\n";
+        reply += data
+          .slice(0, 3)
+          .map((p) => {
+            const name = p.name || "（未命名）";
+            const rel = p.relationship_to_me ? `（${p.relationship_to_me}）` : "";
+            const title = p.card_title ? ` — ${p.card_title}` : "";
+            return `- ${name}${rel}${title}`;
+          })
+          .join("\n");
+
+        appendMessage("agent", reply);
+
+        // 把第一个匹配的人展示在右侧卡片区
+        currentCardEl.innerHTML = renderPersonCard(data[0]);
+        statusEl.textContent = "我已经根据你的描述推荐了几个人，也把其中一个展示在右边卡片里了～";
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "搜索失败了，可能是后端没有运行或网络问题。";
+      }
+    }
+
     async function handleSend() {
       const text = chatInput.value.trim();
       if (!text) return;
@@ -573,16 +695,18 @@
       if (pendingQuestion === "name") {
         knownName = text;
         pendingQuestion = null;
-        // 补一句 agent 小确认
         appendMessage("agent", `好的，我记下来了，Ta 的名字是 ${text}。我再帮你更新一下人物卡片～`);
         await callSpark();
       } else if (pendingQuestion === "main_contact") {
         knownMainContact = text;
         pendingQuestion = null;
-        appendMessage("agent", `好的，我会用这个作为主要联系方式。让我再更新一下这张卡片。`);
+        appendMessage("agent", "好的，我会用这个作为主要联系方式。让我再更新一下这张卡片。");
         await callSpark();
+      } else if (isSearchQuery(text)) {
+        // ⭐ 搜索模式：不修改当前人物，直接在已有卡片中找人
+        await searchPeople(text);
       } else {
-        // 普通描述：把新的对话发给后端，让它重新整理
+        // 普通描述：更新 / 创建人物卡片
         await callSpark();
       }
     }
@@ -595,10 +719,108 @@
       }
     });
 
-    // 页面加载时，先来一条引导消息 + 加载历史人物
+    // ---- 语音输入 & 照片上传支持 ----
+    const voiceBtn = document.getElementById("voice-btn");
+    const attachBtn = document.getElementById("attach-btn");
+    const photoInput = document.getElementById("photo-input");
+
+    // 上传图片并（如果有 currentPersonId）关联
+    async function uploadPhotoFile(file) {
+      try {
+        const fd = new FormData();
+        fd.append("file", file);
+        if (currentPersonId) fd.append("id", String(currentPersonId));
+
+        statusEl.textContent = "正在上传照片…";
+        const res = await fetch("/api/upload_photo", {
+          method: "POST",
+          body: fd,
+        });
+        if (!res.ok) throw new Error("上传失败");
+        const j = await res.json();
+
+        // 重新加载人物列表并尝试把该人物展示出来
+        await loadPeople();
+        if (j.id) {
+          const peopleRes = await fetch("/api/people");
+          const people = await peopleRes.json();
+          const person = people.find((p) => p.id === j.id);
+          if (person) currentCardEl.innerHTML = renderPersonCard(person);
+          statusEl.textContent = "照片上传并已保存到该人物卡片。";
+        } else {
+          statusEl.textContent = "照片已上传（未关联到人物）。你可以在创建/更新卡片时保存。";
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "照片上传失败。";
+      }
+    }
+
+    attachBtn.addEventListener("click", () => photoInput.click());
+    photoInput.addEventListener("change", (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) uploadPhotoFile(f);
+      // reset so same file can be selected again
+      photoInput.value = null;
+    });
+
+    // 语音识别（Web Speech API）
+    let recognition = null;
+    let recognizing = false;
+    function setupRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return null;
+      const r = new SpeechRecognition();
+      r.lang = "zh-CN";
+      r.interimResults = false;
+      r.maxAlternatives = 1;
+      r.onstart = () => {
+        recognizing = true;
+        voiceBtn.textContent = "⏹️";
+        statusEl.textContent = "正在听写，点击停止或再次点击麦克风。";
+      };
+      r.onend = () => {
+        recognizing = false;
+        voiceBtn.textContent = "🎤";
+        statusEl.textContent = "";
+      };
+      r.onerror = (e) => {
+        console.error(e);
+        recognizing = false;
+        voiceBtn.textContent = "🎤";
+        statusEl.textContent = "语音识别失败（请检查浏览器权限）。";
+      };
+      r.onresult = (ev) => {
+        const t = ev.results[0][0].transcript;
+        chatInput.value = t;
+        // 自动发送转写结果
+        handleSend();
+      };
+      return r;
+    }
+
+    voiceBtn.addEventListener("click", () => {
+      if (!recognition) recognition = setupRecognition();
+      if (!recognition) {
+        statusEl.textContent = "当前浏览器不支持语音识别（试试 Chrome/Edge）。";
+        return;
+      }
+
+      if (!recognizing) {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        recognition.stop();
+      }
+    });
+
+    // 页面加载时，引导 + 加载已有卡片列表
     appendMessage(
       "agent",
-      "嗨～先选一个大致场景，然后用一两句话跟我说说这个人。比如：我们在哪里认识、Ta 是怎样的人，你现在想跟 Ta 保持怎样的关系。"
+      "嗨～先选一个大致场景，然后用一两句话跟我说说这个人。比如：我们在哪里认识、Ta 是怎样的人，你现在想跟 Ta 保持怎样的关系。\n\n如果你想从已经记录的人里“找人”，可以直接说：找有人机交互背景的人聊聊。"
     );
     loadPeople();
   </script>

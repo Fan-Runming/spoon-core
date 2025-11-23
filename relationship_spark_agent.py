@@ -90,7 +90,6 @@ class RelationshipSparkAgent(ToolCallAgent):
         last_contact: Optional[str] = None,
     ) -> Dict:
         """
-        对外暴露的核心方法：
         输入场景 + 关系描述 + 已知人物信息，返回完整的 person 结构：
           {
             "name", "main_contact", "relationship_to_me", "how_we_met", "location", "last_contact",
@@ -114,7 +113,11 @@ class RelationshipSparkAgent(ToolCallAgent):
         if last_contact:
             known_info_lines.append(f"Known last contact: {last_contact}")
 
-        known_info_text = "\n".join(known_info_lines) if known_info_lines else "Known info: (none provided)."
+        known_info_text = (
+            "\n".join(known_info_lines)
+            if known_info_lines
+            else "Known info: (none provided)."
+        )
 
         user_prompt = (
             "Here is the relationship context (a conversation-like transcript) and any known info "
@@ -126,8 +129,7 @@ class RelationshipSparkAgent(ToolCallAgent):
             "Remember: respond ONLY in the exact OUTPUT FORMAT defined in the system prompt."
         )
 
-
-        # 直接让 ToolCallAgent 跑一轮
+        # 调用 Agent
         result = await self.run(user_prompt)
 
         # 无论 result 是 dict 还是别的，先转成纯文本
@@ -172,7 +174,7 @@ class RelationshipSparkAgent(ToolCallAgent):
         Summary: ...
         """
         lines = text.splitlines()
-        # 先准备好默认值
+        # 默认值
         data = {
             "name": "",
             "main_contact": "",
@@ -189,7 +191,6 @@ class RelationshipSparkAgent(ToolCallAgent):
             "summary": "",
         }
 
-        # 把所有行按前缀解析
         for raw in lines:
             line = raw.strip()
             lower = line.lower()
@@ -224,13 +225,12 @@ class RelationshipSparkAgent(ToolCallAgent):
             elif lower.startswith("summary:"):
                 data["summary"] = val_after("Summary:")
 
-        # 兜底：如果 suggestion 或 summary 为空，就把整个文本塞进去
+        # 兜底
         if not data["suggestion"]:
             data["suggestion"] = text
         if not data["summary"]:
             data["summary"] = "模型没有按预期格式返回 Summary，这里先用整体输出作为建议的补充。"
 
-        # 如果 card_title 为空，就用 name 或 relationship_to_me 兜底
         if not data["card_title"]:
             if data["relationship_to_me"]:
                 data["card_title"] = data["relationship_to_me"]
@@ -245,15 +245,9 @@ class RelationshipSparkAgent(ToolCallAgent):
 def create_default_relationship_agent() -> RelationshipSparkAgent:
     """
     工厂函数：创建一个默认配置好的 RelationshipSparkAgent。
-
-    你可以根据自己的 .env / config 把 llm_provider 和 model_name 换成你正在用的默认值。
     """
-
     llm = ChatBot(
-        # 如果你在 config.json / .env 里已经设置默认 provider 和 model，
-        # 也可以只写 ChatBot() 靠默认配置。
         llm_provider="gemini",          # ⭐ 根据自己实际环境改
         model_name="gemini-2.5-pro",    # ⭐ 或你想用的模型名称
     )
-
     return RelationshipSparkAgent(llm=llm)
