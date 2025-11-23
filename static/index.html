@@ -559,6 +559,38 @@
         min-height: 40px;
       }
     }
+
+    /* Card loading overlay */
+    .card {
+      position: relative; /* allow overlay positioning */
+    }
+
+    .card-loading-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2,6,23,0.6);
+      border-radius: 12px;
+  z-index: 30;
+  pointer-events: auto; /* block interactions while loading */
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.12);
+      border-top-color: #60a5fa;
+      animation: spin 1s linear infinite;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -659,6 +691,39 @@
       statusEl.textContent = '';
     }
 
+    // Set the current editing person for the conversation UI.
+    // If `silent` is false (default), append a short agent message to indicate we switched.
+    function setEditingPerson(person, silent = false) {
+      if (!person) return;
+      currentPersonId = person.id || null;
+      knownName = person.name || knownName;
+      knownMainContact = person.main_contact || knownMainContact;
+      pendingQuestion = null;
+
+      // Keep existing chat history by default. If history is empty, seed a prompt.
+      if (!silent) {
+        const displayName = person.name || '(Unnamed)';
+        appendMessage('agent', `Now editing ${displayName}'s profile. Continue the conversation to update their card.`);
+      }
+    }
+
+    // Show / hide loading overlay on the current card
+    function showCardLoading(show) {
+      if (!currentCardEl) return;
+      let overlay = currentCardEl.querySelector('.card-loading-overlay');
+      if (show) {
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.className = 'card-loading-overlay';
+          overlay.innerHTML = '<div class="spinner" aria-hidden="true"></div>';
+          currentCardEl.appendChild(overlay);
+        } else {
+          overlay.style.display = 'flex';
+        }
+      } else {
+        if (overlay) overlay.remove();
+      }
+    }
     // Listen to scene change to reset state for new person
     sceneSelect.addEventListener('change', () => {
       if (chatHistory.length > 0 || currentPersonId !== null) {
@@ -837,7 +902,10 @@
               // try to find person in current DOM dataset by id via fetch fallback
               fetch('/api/people').then(r => r.ok ? r.json() : []).then(list => {
                 const p = Array.isArray(list) ? list.find((p) => p.id === id) : null;
-                if (p) currentCardEl.innerHTML = renderPersonCard(p);
+                if (p) {
+                  currentCardEl.innerHTML = renderPersonCard(p);
+                  setEditingPerson(p);
+                }
               }).catch(() => {});
             }
           });
@@ -858,7 +926,10 @@
             if (!isNaN(id)) {
               fetch('/api/people').then(r => r.ok ? r.json() : []).then(list => {
                 const p = Array.isArray(list) ? list.find((p) => p.id === id) : null;
-                if (p) currentCardEl.innerHTML = renderPersonCard(p);
+                if (p) {
+                  currentCardEl.innerHTML = renderPersonCard(p);
+                  setEditingPerson(p);
+                }
               }).catch(() => {});
             }
           });
@@ -915,6 +986,7 @@
             const person = data.find((p) => p.id === id);
             if (person) {
               currentCardEl.innerHTML = renderPersonCard(person);
+              setEditingPerson(person);
             }
           });
         });
@@ -935,10 +1007,8 @@
 
       sendBtn.disabled = true;
       statusEl.textContent = "Thinking with your Relationship Spark Agent…";
-      currentCardEl.innerHTML = `
-        <div class="card-title">Generating…</div>
-        <div class="card-subtitle">I'm processing what you said and organizing this relationship.</div>
-      `;
+      // keep existing card visible and show a loading overlay on top
+      showCardLoading(true);
 
       try {
         const res = await fetch("/api/spark", {
@@ -962,11 +1032,12 @@
 
         const data = await res.json();
 
-        // ⭐ Save current person's ID for future updates to the same card
-        currentPersonId = data.id;
+  // ⭐ Save current person's ID for future updates to the same card
+  currentPersonId = data.id;
 
-        currentCardEl.innerHTML = renderPersonCard(data);
-        statusEl.textContent = "Done ✔ This card has been saved to the list below~";
+  // replace the displayed card with updated content (overlay will be removed by innerHTML)
+  currentCardEl.innerHTML = renderPersonCard(data);
+  statusEl.textContent = "Done ✔ This card has been saved to the list below~";
 
         // Update people list in-place to reflect the newly created/updated person
         try {
@@ -998,6 +1069,8 @@
           <div class="card-subtitle">Please check the terminal for error messages or try again later.</div>
         `;
       } finally {
+        // ensure loading overlay is removed if still present
+        showCardLoading(false);
         sendBtn.disabled = false;
       }
     }
