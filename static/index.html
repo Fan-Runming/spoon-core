@@ -736,10 +736,18 @@
       const suggestion = person.suggestion || "";
       const summary = person.summary || "";
 
-      // Photo display (if any)
+      // Photo display - support both photo_url (single) and photos (array)
       let photosHtml = "";
+      const photoUrls = [];
+      if (person.photo_url) {
+        photoUrls.push(person.photo_url);
+      }
       if (person.photos && person.photos.length > 0) {
-        photosHtml = `<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap">${person.photos
+        photoUrls.push(...person.photos);
+      }
+      
+      if (photoUrls.length > 0) {
+        photosHtml = `<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap">${photoUrls
           .map((p) => `<img src="${escapeHtml(p)}" style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #1f2937;"/>`)
           .join("")}</div>`;
       }
@@ -784,8 +792,16 @@
 
       const subtitle = subtitleParts.join(" · ");
 
-      const avatar = person.photos && person.photos.length > 0 ? `<img src="${escapeHtml(
-        person.photos[0]
+      // Avatar - support both photo_url (single) and photos (array)
+      let avatarUrl = null;
+      if (person.photo_url) {
+        avatarUrl = person.photo_url;
+      } else if (person.photos && person.photos.length > 0) {
+        avatarUrl = person.photos[0];
+      }
+
+      const avatar = avatarUrl ? `<img src="${escapeHtml(
+        avatarUrl
       )}" style="width:44px;height:44px;object-fit:cover;border-radius:8px;margin-right:8px;border:1px solid #1f2937;"/>` : "";
 
       return `

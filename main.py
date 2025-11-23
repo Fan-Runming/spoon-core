@@ -2,8 +2,9 @@
 
 from pathlib import Path
 from typing import List, Optional
+import shutil
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
@@ -47,6 +48,7 @@ class PersonRecord(BaseModel):
     card_title: str
     suggestion: str
     summary: str
+    photo_url: Optional[str] = None  # 头像照片 URL
 
 
 class SparkRequest(BaseModel):
@@ -187,6 +189,51 @@ async def search_people(q: str = Query(..., description="搜索关键词")):
             results.append(p)
 
     return results
+
+
+# ---------- API: /api/upload_photo ----------
+@app.post("/api/upload_photo")
+async def upload_photo(
+    file: UploadFile = File(...),
+    id: Optional[int] = Form(None)
+):
+    """
+    上传头像照片
+    - 如果提供 id，将照片关联到该人物
+    - 照片保存到 static/uploads/ 目录
+    """
+    # 创建 uploads 目录
+    UPLOAD_DIR = STATIC_DIR / "uploads"
+    UPLOAD_DIR.mkdir(exist_ok=True)
+
+    # 生成安全的文件名
+    import uuid
+    file_ext = Path(file.filename).suffix if file.filename else ".jpg"
+    safe_filename = f"{uuid.uuid4()}{file_ext}"
+    file_path = UPLOAD_DIR / safe_filename
+
+    # 保存文件
+    try:
+        with file_path.open("wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+    finally:
+        file.file.close()
+
+    # 生成可访问的 URL
+    photo_url = f"/static/uploads/{safe_filename}"
+
+    # 如果提供了 id，更新对应人物的照片
+    if id is not None:
+        for person in PEOPLE_DB:
+            if person.id == id:
+                person.photo_url = photo_url
+                return {"success": True, "photo_url": photo_url, "id": id}
+        raise HTTPException(status_code=404, detail=f"Person with id {id} not found")
+
+    # 如果没有提供 id，只返回上传成功的 URL
+    return {"success": True, "photo_url": photo_url, "id": None}
 
 
 # ---------- 静态页面（index.html） ----------

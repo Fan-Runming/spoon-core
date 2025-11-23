@@ -50,3 +50,144 @@ INFO:     127.0.0.1:49628 - "GET / HTTP/1.1" 200 OK
 INFO:     127.0.0.1:49628 - "GET /api/people HTTP/1.1" 200 OK
 INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
 INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     2601:647:4001:d460:3f0:a76e:d655:eb4:0 - "GET / HTTP/1.1" 200 OK
+INFO:     2601:647:4001:d460:3f0:a76e:d655:eb4:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     2601:647:4001:d460:3f0:a76e:d655:eb4:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     208.82.100.10:0 - "POST /api/upload_photo HTTP/1.1" 404 Not Found
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/upload_photo HTTP/1.1" 404 Not Found
+INFO:     2601:647:4001:d460:3f0:a76e:d655:eb4:0 - "GET / HTTP/1.1" 200 OK
+INFO:     2601:647:4001:d460:3f0:a76e:d655:eb4:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     2601:647:4001:d460:3f0:a76e:d655:eb4:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/upload_photo HTTP/1.1" 404 Not Found
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/upload_photo HTTP/1.1" 404 Not Found
+INFO:     2601:647:4001:d460:3f0:a76e:d655:eb4:0 - "GET / HTTP/1.1" 200 OK
+INFO:     2601:647:4001:d460:3f0:a76e:d655:eb4:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     2601:647:4001:d460:3f0:a76e:d655:eb4:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/upload_photo HTTP/1.1" 404 Not Found
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50097 - "POST /api/upload_photo HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50097 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50097 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50110 - "POST /api/upload_photo HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50180 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50180 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50193 - "POST /api/upload_photo HTTP/1.1" 404 Not Found
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [73999]
+INFO:     Started server process [74768]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [74768]
+INFO:     Started server process [74774]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [74774]
+INFO:     Started server process [74779]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:50264 - "POST /api/upload_photo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50272 - "GET /static/uploads/950a17f9-87c4-40b0-bcca-5cbb741bfb7f.gif HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50279 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50312 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50318 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50341 - "POST /api/upload_photo HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50345 - "POST /api/upload_photo HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [74779]
+INFO:     Started server process [76502]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50430 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50430 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50449 - "POST /api/upload_photo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50449 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50460 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50470 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50470 - "POST /api/upload_photo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50470 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50472 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50470 - "GET /static/uploads/fda73793-db69-41c1-95bb-cf7247018efc.JPG HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/spark HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/upload_photo HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/upload_photo HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50724 - "POST /api/upload_photo HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50724 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50726 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50724 - "GET /static/uploads/37bb06ae-ff1e-4570-b802-59a65f451ece.JPG HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50725 - "GET /static/uploads/659e1856-e727-411f-badd-3beadd2dcd61.jpeg HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/upload_photo HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /static/uploads/e58b710b-5a2f-4ca2-b4ae-3d7210ab6b6b.jpeg HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /static/uploads/37bb06ae-ff1e-4570-b802-59a65f451ece.JPG HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "POST /api/upload_photo HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50868 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50868 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50868 - "GET /static/uploads/e58b710b-5a2f-4ca2-b4ae-3d7210ab6b6b.jpeg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50869 - "GET /static/uploads/37bb06ae-ff1e-4570-b802-59a65f451ece.JPG HTTP/1.1" 304 Not Modified
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50893 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50893 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50893 - "GET /static/uploads/37bb06ae-ff1e-4570-b802-59a65f451ece.JPG HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:50894 - "GET /static/uploads/e58b710b-5a2f-4ca2-b4ae-3d7210ab6b6b.jpeg HTTP/1.1" 304 Not Modified
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50970 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50970 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50971 - "GET /static/uploads/e58b710b-5a2f-4ca2-b4ae-3d7210ab6b6b.jpeg HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:50970 - "GET /static/uploads/37bb06ae-ff1e-4570-b802-59a65f451ece.JPG HTTP/1.1" 304 Not Modified
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51769 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51775 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51786 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51786 - "GET /api/people HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51796 - "GET /static/uploads/37bb06ae-ff1e-4570-b802-59a65f451ece.JPG HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:51797 - "GET /static/uploads/e58b710b-5a2f-4ca2-b4ae-3d7210ab6b6b.jpeg HTTP/1.1" 304 Not Modified
+INFO:     208.82.100.10:0 - "GET / HTTP/1.1" 200 OK
