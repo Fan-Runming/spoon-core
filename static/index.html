@@ -1,0 +1,606 @@
+<!-- static/index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Relationship Spark Notebook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr);
+      gap: 24px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 16px;
+    }
+
+    .panel {
+      background: #020617;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+      border: 1px solid #1e293b;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 4px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 13px;
+      display: block;
+      margin-bottom: 6px;
+      color: #e5e7eb;
+    }
+
+    select {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #020617;
+      color: #e5e7eb;
+      padding: 6px 10px;
+      font-size: 13px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+
+    .chat-window {
+      flex: 1;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      background: #020617;
+      padding: 10px 10px 6px;
+      overflow-y: auto;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .chat-message {
+      margin-bottom: 8px;
+      max-width: 90%;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .chat-message.user {
+      align-self: flex-end;
+      text-align: right;
+    }
+
+    .chat-message.agent {
+      align-self: flex-start;
+    }
+
+    .bubble {
+      display: inline-block;
+      padding: 7px 10px;
+      border-radius: 12px;
+    }
+
+    .bubble-user {
+      background: #22c55e;
+      color: #022c22;
+      border-bottom-right-radius: 2px;
+    }
+
+    .bubble-agent {
+      background: #0f172a;
+      border: 1px solid #1f2937;
+      color: #e5e7eb;
+      border-bottom-left-radius: 2px;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .chat-input {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid #334155;
+      background: #020617;
+      color: #e5e7eb;
+      padding: 8px 12px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 8px 13px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #22c55e, #0ea5e9);
+      color: #0b1120;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .status {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 6px;
+      min-height: 16px;
+    }
+
+    .card {
+      background: #020617;
+      border-radius: 14px;
+      border: 1px solid #1e293b;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 2px;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #a5b4fc;
+      margin-bottom: 4px;
+    }
+
+    .section-text {
+      font-size: 13px;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+      margin-bottom: 8px;
+    }
+
+    .tag-row {
+      margin-bottom: 6px;
+    }
+
+    .tag-group-label {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      margin: 2px 4px 2px 0;
+    }
+
+    .tag-personality {
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.65);
+      color: #bbf7d0;
+    }
+
+    .tag-goal {
+      background: rgba(249,115,22,0.12);
+      border: 1px solid rgba(249,115,22,0.7);
+      color: #fed7aa;
+    }
+
+    .tag-interest {
+      background: rgba(56,189,248,0.12);
+      border: 1px solid rgba(56,189,248,0.7);
+      color: #bae6fd;
+    }
+
+    .tag-career {
+      background: rgba(168,85,247,0.12);
+      border: 1px solid rgba(168,85,247,0.7);
+      color: #e9d5ff;
+    }
+
+    .card-meta {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .people-list {
+      margin-top: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .people-list-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #9ca3af;
+      margin: 12px 0 4px;
+    }
+
+    .mini-card {
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      background: #020617;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .mini-card:hover {
+      border-color: #4b5563;
+      background: #020617;
+    }
+
+    .mini-title {
+      font-size: 13px;
+      color: #e2e8f0;
+      margin-bottom: 2px;
+    }
+
+    .mini-subtitle {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 左侧：对话式输入 -->
+    <div class="panel">
+      <h1>Relationship Spark Notebook</h1>
+      <div class="subtitle">
+        通过一段对话，把你和 Ta 的故事说出来。<br />
+        Agent 会自动抽取姓名、联系方式、关系标签，并在缺失时向你追问。
+      </div>
+
+      <label for="scene">Scene / 场景</label>
+      <select id="scene">
+        <option value="stay_in_touch">保持联系（stay in touch）</option>
+        <option value="first_meeting">初次认识（first meeting）</option>
+        <option value="long_time_no_see">很久没联系（long time no see）</option>
+        <option value="repair_tension">想修复关系（repair tension）</option>
+        <option value="uncertain">不确定，只是想记录（uncertain）</option>
+      </select>
+
+      <div id="chat-window" class="chat-window"></div>
+
+      <div class="chat-input-row">
+        <input
+          id="chat-input"
+          class="chat-input"
+          placeholder="跟我说说 Ta 吧，比如：我们是在某次活动认识的、Ta 是怎样的人、你们现在的状态…"
+        />
+        <button id="send-btn">发送</button>
+      </div>
+
+      <div class="status" id="status"></div>
+    </div>
+
+    <!-- 右侧：卡片展示 + 列表 -->
+    <div class="panel">
+      <h2>✨ 当前人物卡片</h2>
+
+      <div id="current-card" class="card">
+        <div class="card-title">还没有卡片</div>
+        <div class="card-subtitle">在左边开始一段对话，然后我会帮你生成关于 Ta 的人物卡片。</div>
+      </div>
+
+      <div class="people-list-title">📒 我最近记录的人</div>
+      <div id="people-list" class="people-list">
+        <!-- mini cards -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sceneSelect = document.getElementById("scene");
+    const chatWindow = document.getElementById("chat-window");
+    const chatInput = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+    const statusEl = document.getElementById("status");
+    const currentCardEl = document.getElementById("current-card");
+    const peopleListEl = document.getElementById("people-list");
+
+    // 对话历史（只记录用户和 agent 的文本，后端用拼接后的文本）
+    const chatHistory = []; // { role: 'user' | 'agent', text: string }
+
+    // 通过追问得到的关键信息
+    let knownName = null;
+    let knownMainContact = null;
+
+    // 当前是否在等用户回答某个追问字段
+    // 'name' | 'main_contact' | null
+    let pendingQuestion = null;
+
+    function appendMessage(role, text) {
+      chatHistory.push({ role, text });
+
+      const msg = document.createElement("div");
+      msg.className = `chat-message ${role}`;
+
+      const bubble = document.createElement("div");
+      bubble.className = `bubble ${role === "user" ? "bubble-user" : "bubble-agent"}`;
+      bubble.textContent = text;
+
+      msg.appendChild(bubble);
+      chatWindow.appendChild(msg);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function composeContextText() {
+      // 把对话历史拼成一大段文本
+      return chatHistory
+        .map((m) => (m.role === "user" ? `User: ${m.text}` : `Agent: ${m.text}`))
+        .join("\n");
+    }
+
+    function renderTags(type, tags) {
+      if (!tags || tags.length === 0) return "";
+      const classMap = {
+        personality: "tag-personality",
+        goal: "tag-goal",
+        interest: "tag-interest",
+        career: "tag-career",
+      };
+      const className = classMap[type] || "tag";
+      const labelMap = {
+        personality: "Personality / 性格",
+        goal: "Goals / 目标",
+        interest: "Interests / 兴趣",
+        career: "Career / 职业/专业",
+      };
+      const label = labelMap[type] || type;
+
+      const pills = tags
+        .map((t) => `<span class="tag ${className}">${escapeHtml(t)}</span>`)
+        .join("");
+
+      return `
+        <div class="tag-row">
+          <div class="tag-group-label">${label}</div>
+          <div>${pills}</div>
+        </div>
+      `;
+    }
+
+    function renderPersonCard(person) {
+      const title = escapeHtml(person.card_title || "未命名人物卡片");
+      const nameLine = person.name ? escapeHtml(person.name) : "（未填写姓名）";
+      const relation = person.relationship_to_me ? ` · ${escapeHtml(person.relationship_to_me)}` : "";
+      const contact = person.main_contact ? `联系方式：${escapeHtml(person.main_contact)}` : "";
+      const howWeMet = person.how_we_met ? `相识方式：${escapeHtml(person.how_we_met)}` : "";
+      const location = person.location ? `Ta 大概在：${escapeHtml(person.location)}` : "";
+      const lastContact = person.last_contact ? `上次联系：${escapeHtml(person.last_contact)}` : "";
+
+      const suggestion = person.suggestion || "";
+      const summary = person.summary || "";
+
+      return `
+        <div class="card">
+          <div class="card-title">${title}</div>
+          <div class="card-subtitle">${nameLine}${relation}</div>
+
+          ${renderTags("personality", person.personality_tags)}
+          ${renderTags("goal", person.goal_tags)}
+          ${renderTags("interest", person.interest_tags)}
+          ${renderTags("career", person.career_tags)}
+
+          <div class="section-label">Relationship Summary / 关系小结</div>
+          <div class="section-text">${escapeHtml(summary)}</div>
+
+          <div class="section-label">Next Step Suggestion / 下一步可以怎么联系 Ta</div>
+          <div class="section-text">${escapeHtml(suggestion)}</div>
+
+          <div class="card-meta">
+            ${contact ? contact + " · " : ""}
+            ${howWeMet ? howWeMet + " · " : ""}
+            ${location ? location + " · " : ""}
+            ${lastContact ? lastContact : ""}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMiniCard(person) {
+      const title = escapeHtml(person.card_title || "未命名人物卡片");
+      const subtitleParts = [];
+      if (person.name) subtitleParts.push(person.name);
+      if (person.relationship_to_me) subtitleParts.push(person.relationship_to_me);
+
+      const subtitle = subtitleParts.join(" · ");
+
+      return `
+        <div class="mini-card" data-id="${person.id}">
+          <div class="mini-title">${title}</div>
+          <div class="mini-subtitle">${subtitle || "还没有填写姓名/关系"}</div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    async function loadPeople() {
+      try {
+        const res = await fetch("/api/people");
+        if (!res.ok) throw new Error("Failed to load people");
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          peopleListEl.innerHTML = `<div style="font-size:12px;color:#64748b;">还没有记录任何人。</div>`;
+          return;
+        }
+
+        peopleListEl.innerHTML = data.map(renderMiniCard).join("");
+
+        // 点击 mini card 展示到当前卡片区域
+        peopleListEl.querySelectorAll(".mini-card").forEach((el) => {
+          el.addEventListener("click", () => {
+            const id = Number(el.getAttribute("data-id"));
+            const person = data.find((p) => p.id === id);
+            if (person) {
+              currentCardEl.innerHTML = renderPersonCard(person);
+            }
+          });
+        });
+      } catch (err) {
+        console.error(err);
+        peopleListEl.innerHTML = `<div style="font-size:12px;color:#f97373;">加载人物列表失败。</div>`;
+      }
+    }
+
+    async function callSpark() {
+      const scene = sceneSelect.value;
+      const context = composeContextText();
+
+      if (!context.trim()) {
+        statusEl.textContent = "先跟我说一点关于 Ta 的事情吧～";
+        return;
+      }
+
+      sendBtn.disabled = true;
+      statusEl.textContent = "Thinking with your Relationship Spark Agent…";
+      currentCardEl.innerHTML = `
+        <div class="card-title">生成中…</div>
+        <div class="card-subtitle">我正在消化你说的内容，帮你整理这段关系。</div>
+      `;
+
+      try {
+        const res = await fetch("/api/spark", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            scene,
+            context,
+            name: knownName,
+            main_contact: knownMainContact,
+          }),
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Server error: ${res.status} ${errText}`);
+        }
+
+        const data = await res.json();
+        currentCardEl.innerHTML = renderPersonCard(data);
+        statusEl.textContent = "完成 ✔ 这张卡片已经被记录在右下角列表中～";
+
+        await loadPeople();
+
+        // 检查是否缺少关键信息：姓名 / 主要联系方式
+        if (!data.name && !knownName) {
+          const q = "我还不知道 Ta 的名字，你方便告诉我吗？";
+          appendMessage("agent", q);
+          pendingQuestion = "name";
+        } else if (!data.main_contact && !knownMainContact) {
+          const q = "那通常你是通过什么方式联系 Ta 的？可以给一个你习惯使用的联系方式（比如微信号、手机号或邮箱）。";
+          appendMessage("agent", q);
+          pendingQuestion = "main_contact";
+        } else {
+          // 信息比较完整，可以给一个温柔的收尾提示（可选）
+          if (!pendingQuestion) {
+            appendMessage("agent", "我已经帮你记录好 Ta 啦～之后你也可以继续补充关于 Ta 的故事。");
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "调用失败了，检查一下后端是否在运行（uvicorn main:app --reload）。";
+        currentCardEl.innerHTML = `
+          <div class="card-title">出错了</div>
+          <div class="card-subtitle">请在终端查看错误信息，或稍后重试。</div>
+        `;
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+
+    async function handleSend() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      chatInput.value = "";
+
+      appendMessage("user", text);
+
+      // 如果当前在等用户回答姓名 / 联系方式，就把这一句当成答案
+      if (pendingQuestion === "name") {
+        knownName = text;
+        pendingQuestion = null;
+        // 补一句 agent 小确认
+        appendMessage("agent", `好的，我记下来了，Ta 的名字是 ${text}。我再帮你更新一下人物卡片～`);
+        await callSpark();
+      } else if (pendingQuestion === "main_contact") {
+        knownMainContact = text;
+        pendingQuestion = null;
+        appendMessage("agent", `好的，我会用这个作为主要联系方式。让我再更新一下这张卡片。`);
+        await callSpark();
+      } else {
+        // 普通描述：把新的对话发给后端，让它重新整理
+        await callSpark();
+      }
+    }
+
+    sendBtn.addEventListener("click", handleSend);
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+
+    // 页面加载时，先来一条引导消息 + 加载历史人物
+    appendMessage(
+      "agent",
+      "嗨～先选一个大致场景，然后用一两句话跟我说说这个人。比如：我们在哪里认识、Ta 是怎样的人，你现在想跟 Ta 保持怎样的关系。"
+    );
+    loadPeople();
+  </script>
+</body>
+</html>
